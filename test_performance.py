@@ -74,6 +74,8 @@ def performance_test():
         count_phone = len(system_with_index.find_by_phone(search_prefix_phone))
         print(f"   按电话前缀查询 '{search_prefix_phone}'（100次平均）：{phone_search_time_with_index*1000:.4f}ms（找到{count_phone}条）")
         
+
+
         # 测试2: 无索引的系统（仅链表）
         print("\n2. 无索引系统测试 (仅双向链表线性扫描)")
         print("   " + "-" * 65)
