@@ -221,3 +221,59 @@ class ContactSystem:
                 results.extend(contacts)
         return results
     
+    def find_by_phone(self, phone_prefix: str) -> List[Contact]:
+        """按电话号码前缀查询"""
+        if not phone_prefix:
+            return []
+        
+        # 优先使用Trie树
+        if self.use_phone_trie and self.phone_trie:
+            return self.phone_trie.search_prefix(phone_prefix)
+        
+        # 回退到线性扫描
+        results = []
+        node = self.head
+        while node:
+            if node.contact.phone.startswith(phone_prefix):
+                results.append(node.contact)
+            node = node.next
+        return results
+    
+    def list_all(self) -> List[Contact]:
+        """列出所有联系人"""
+        results = []
+        node = self.head
+        while node:
+            results.append(node.contact)
+            node = node.next
+        return results
+    
+    def _find_node(self, contact: Contact) -> Optional[Node]:
+        """在双向链表中查找联系人对应的节点"""
+        node = self.head
+        while node:
+            if node.contact is contact:
+                return node
+            node = node.next
+        return None
+    
+    def save_to_file(self) -> Tuple[bool, str]:
+        """保存数据到JSON文件"""
+        try:
+            contacts_data = []
+            node = self.head
+            while node:
+                contacts_data.append({
+                    "name": node.contact.name,
+                    "phone": node.contact.phone,
+                    "remark": node.contact.remark
+                })
+                node = node.next
+            
+            with open(self.data_file, 'w', encoding='utf-8') as f:
+                json.dump(contacts_data, f, ensure_ascii=False, indent=2)
+            
+            return True, f"成功：数据已保存到 {self.data_file}"
+        except Exception as e:
+            return False, f"错误：保存失败 - {str(e)}"
+    
