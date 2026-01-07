@@ -277,3 +277,34 @@ class ContactSystem:
         except Exception as e:
             return False, f"错误：保存失败 - {str(e)}"
     
+    def load_from_file(self) -> Tuple[int, str]:
+        """从JSON文件加载数据"""
+        if not os.path.exists(self.data_file):
+            return 0, f"信息：文件 {self.data_file} 不存在"
+        
+        try:
+            with open(self.data_file, 'r', encoding='utf-8') as f:
+                contacts_data = json.load(f)
+            
+            loaded_count = 0
+            for item in contacts_data:
+                success, _ = self.add_contact(
+                    item.get('name', ''),
+                    item.get('phone', ''),
+                    item.get('remark', '')
+                )
+                if success:
+                    loaded_count += 1
+            
+            return loaded_count, f"成功：已加载 {loaded_count} 个联系人到通讯录"
+        except Exception as e:
+            return 0, f"错误：加载失败 - {str(e)}"
+    
+    def get_stats(self) -> Dict:
+        """获取系统统计信息"""
+        return {
+            "total_contacts": self.size,
+            "unique_names": len(self.name_hash),
+            "use_name_index": self.use_name_trie,
+            "use_phone_index": self.use_phone_trie
+        }
